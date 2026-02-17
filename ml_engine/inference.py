@@ -66,13 +66,14 @@ def predict_priority_score(patient_data: dict) -> dict:
     red_flag_score = None
     red_flag_risk = None
 
-    if chest_pain == 1 and age > 45:
+    # Critical Cardiac / Stroke Indicators
+    if (chest_pain == 1 and age > 45) or (patient_data.get('symptom_numbness', 0) == 1):
         red_flag_score = 99
-        red_flag_risk = "CRITICAL - CARDIAC RISK"
+        red_flag_risk = "CRITICAL - CARDIAC/STROKE RISK"
     elif oxygen_level < 90:
         red_flag_score = 95
         red_flag_risk = "CRITICAL - HYPOXIA"
-    elif heart_rate > 140:
+    elif heart_rate > 100: # Tachycardia threshold lowered as per audit
         red_flag_score = 90
         red_flag_risk = "CRITICAL - TACHYCARDIA"
 
@@ -104,6 +105,10 @@ def predict_priority_score(patient_data: dict) -> dict:
             score_array = model.predict(triage_df)
             triage_score = int(score_array[0])
             triage_score = max(0, min(100, triage_score))
+            
+            # Boost score if HR is elevated but not critical (90-100)
+            if heart_rate > 90 and triage_score < 70:
+                triage_score += 15
 
             if triage_score >= 70:
                 risk_level = "HIGH"

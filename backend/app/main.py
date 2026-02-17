@@ -16,8 +16,13 @@ from ml_engine.inference import predict_priority_score
 # Import Member 3's work
 from backend.database.auth import register_user, get_user_by_token
 from backend.utils.qr_generator import generate_emergency_qr
+from backend.app.routers import triage, appointments # Update import
 
 app = FastAPI(title="Lifeline AI API")
+
+# Add this line after 'app = FastAPI()'
+app.include_router(triage.router)
+app.include_router(appointments.router)
 
 # Enable CORS so the Mobile App (React Native/Flutter) can connect
 app.add_middleware(
