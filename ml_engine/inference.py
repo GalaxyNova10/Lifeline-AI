@@ -1,6 +1,6 @@
 """
 Script: inference.py
-Role: The API Bridge for Vital Sync AI
+Role: The API Bridge for Lifeline AI
 Author: ML Lead (Member 1)
 Description: Loads the trained .pkl models and provides a single function 
 for the backend to calculate the Triage Score and Predict Condition.

@@ -7,7 +7,7 @@ import requests
 BASE_URL = "http://127.0.0.1:8000"
 
 def run_integrity_audit():
-    print("🚀 --- VITAL SYNC AI: FINAL INTEGRITY AUDIT --- 🚀")
+    print("🚀 --- LIFELINE AI: FINAL INTEGRITY AUDIT --- 🚀")
 
     # 1. Test Linguistic Resilience (Hindi/Tamil/Slang)
     print("\n🌍 Testing Multilingual NLP Integrity...")

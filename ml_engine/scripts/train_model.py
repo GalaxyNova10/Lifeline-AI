@@ -1,6 +1,6 @@
 """
 Script: train_model.py
-Role: Model Trainer for Vital Sync AI
+Role: Model Trainer for Lifeline AI
 Author: ML Lead (Member 1)
 Description: Loads the synthetic data, trains a Random Forest Regressor, 
 and serializes the model to a .pkl file.

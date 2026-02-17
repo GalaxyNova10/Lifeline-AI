@@ -1,6 +1,6 @@
 """
 Script: generate_data.py
-Role: Synthetic Data Generator for Vital Sync AI
+Role: Synthetic Data Generator for Lifeline AI
 Author: ML Lead (Member 1)
 Description: Generates 2000 dummy patient records with medically accurate logic 
 to train the Triage Engine.

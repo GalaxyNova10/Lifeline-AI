@@ -3,7 +3,7 @@ import requests
 BASE_URL = "http://127.0.0.1:8000"
 
 def final_polish_check():
-    print("💎 --- VITAL SYNC AI: FINAL POLISH AUDIT --- 💎")
+    print("💎 --- LIFELINE AI: FINAL POLISH AUDIT --- 💎")
 
     # Test: Load Balancing for Cardiac Case 
     print("\n🔍 Testing Load Balancing (Cardiac Condition)...")
