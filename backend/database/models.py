@@ -26,6 +26,17 @@ def init_db():
             chronic_conditions TEXT,
             emergency_contact TEXT,
             qr_token TEXT UNIQUE
+        );
+    ''')
+    
+    # Create Vitals Table for rPPG History
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS vitals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_token TEXT NOT NULL,
+            bpm REAL NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_token) REFERENCES users(qr_token)
         )
     ''')
     

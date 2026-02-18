@@ -1,5 +1,5 @@
 """
-Script: triage.py (Hardened Version)
+Script: triage.py (Gold Master)
 Role: Unified Triage with History & Security
 Author: Member 4 (Coordinator)
 """
@@ -49,13 +49,16 @@ async def process_triage(
             # Map history to ML inputs
             if "diabetes" in chronic_conditions: 
                 final_symptoms["history_diabetes"] = 1
+                history_bonus += 15 # Specific bonus for Diabetes [Gold Master req]
             if "stent" in chronic_conditions or "heart" in chronic_conditions or "hypertension" in chronic_conditions:
                 final_symptoms["history_hypertension"] = 1
+            if "asthma" in chronic_conditions:
+                history_bonus += 15 # Specific bonus for Asthma [Gold Master req]
             
             # Safety Logic: Increase base score if high-risk history exists [cite: 13, 34]
             # This is a 'Coordination Layer' bonus on top of ML
             if "stroke" in chronic_conditions or "heart" in chronic_conditions:
-                history_bonus = 20 
+                history_bonus = max(history_bonus, 20) # Ensure at least 20 if Stroke/Heart
 
     # 3. Process Manual UI Symptoms
     if manual_symptoms:
@@ -90,15 +93,24 @@ async def process_triage(
     # Apply Coordination Layer Bonus
     final_score = min(ml_result['score'] + history_bonus, 100)
     risk_level = ml_result['risk_level']
+    predicted_condition = ml_result.get('predicted_condition', 'Unknown')
 
     # 6. Red-Flag Override (Member 4 Hardening) 
     # Hardcoded safety for Tachycardia or specific detected keywords in HISTORY
-    if heart_rate > 120 or "chest" in chronic_conditions: # Tachycardia or Chest Pain History
+    # Gold Master: History of Stroke + Numbness -> 99
+    if "stroke" in chronic_conditions and final_symptoms.get("symptom_numbness") == 1:
         final_score = 99
         risk_level = "CRITICAL"
+        predicted_condition = "Stroke Alert" # Force condition for Scheduler
     
+    elif heart_rate > 120 or "chest" in chronic_conditions: # Tachycardia or Chest Pain History
+        final_score = 99
+        risk_level = "CRITICAL"
+        if "chest" in chronic_conditions:
+            predicted_condition = "Potential Cardiac Event"
+
     # 7. Dynamic Scheduling & Load Balancing (Member 4) [cite: 24, 25]
-    scheduling = calculate_appointment_time(final_score, MOCK_QUEUE, ml_result.get('predicted_condition', 'Unknown'))
+    scheduling = calculate_appointment_time(final_score, MOCK_QUEUE, predicted_condition)
     
     return {
         "status": "success",

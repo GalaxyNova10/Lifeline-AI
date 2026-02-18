@@ -52,5 +52,44 @@ def run_demo():
     except FileNotFoundError:
         print("❌ Audio file 'ml_engine/nlp/test_en.wav' not found.")
 
+    # 4. Test Vitals (Heart Rate) - Member 1 Integration
+    print("\nStep 4: Testing Vitals API (rPPG Heart Rate)...")
+    try:
+        import cv2
+        import numpy as np
+        
+        # Capture a single frame
+        cap = cv2.VideoCapture(0)
+        ret, frame = cap.read()
+        cap.release()
+        
+        if ret:
+            # Encode frame to JPEG
+            _, img_encoded = cv2.imencode('.jpg', frame)
+            files = {"file": ("frame.jpg", img_encoded.tobytes(), "image/jpeg")}
+            data = {"token": token} # Use the token from Step 1
+            
+            t0 = time.time()
+            r = requests.post(f"{BASE_URL}/vitals/process_frame", data=data, files=files)
+            dt = time.time() - t0
+            
+            if r.status_code == 200:
+                result = r.json()
+                bpm = result.get('bpm')
+                print(f"✅ Vitals Processed in {dt:.2f}s")
+                if bpm:
+                    print(f"❤️ Heart Rate: {bpm:.1f} BPM")
+                else:
+                    print(f"⚠️ Heart Rate: Buffer filling / Detecting face...")
+            else:
+                print(f"❌ Vitals API Failed: {r.text}")
+        else:
+            print("⚠️ Could not capture webcam frame for test.")
+            
+    except ImportError:
+        print("⚠️ OpenCV not found, skipping local camera test.")
+    except Exception as e:
+        print(f"❌ Vitals Test Diagnostic Error: {e}")
+
 if __name__ == "__main__":
     run_demo()

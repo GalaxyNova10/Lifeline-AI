@@ -38,9 +38,32 @@ def get_user_by_token(token):
     
     cursor.execute("SELECT * FROM users WHERE qr_token = ?", (token,))
     user = cursor.fetchone()
-    conn.close()
     
-    return dict(user) if user else None
+    if user:
+        user_dict = dict(user)
+        # Fetch latest vital
+        cursor.execute("SELECT bpm, timestamp FROM vitals WHERE user_token = ? ORDER BY id DESC LIMIT 1", (token,))
+        vital = cursor.fetchone()
+        if vital:
+            user_dict["heart_rate"] = vital["bpm"]
+            user_dict["last_vital_time"] = vital["timestamp"]
+        conn.close()
+        return user_dict
+        
+    conn.close()
+    return None
+
+def log_vital(token, bpm):
+    """Logs a heart rate reading to the database."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT INTO vitals (user_token, bpm) VALUES (?, ?)", (token, bpm))
+        conn.commit()
+    except Exception as e:
+        print(f"❌ Vitals Log Error: {e}")
+    finally:
+        conn.close()
 
 if __name__ == "__main__":
     # Test Registration for the Hackathon Demo
